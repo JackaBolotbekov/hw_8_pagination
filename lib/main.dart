@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:hw_8_pagination/rick_screen.dart';
+import 'rick/ui/rick_screen.dart';
 
 void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: RickScreen(),
-  ));
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'HW Pagination',
+      theme: ThemeData(useMaterial3: true),
+      home: const RickScreen(),
+    );
+  }
 }
