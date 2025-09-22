@@ -1,16 +1,53 @@
 import 'package:bloc/bloc.dart';
-import 'package:hw_8_pagination/api_service.dart';
-import 'package:hw_8_pagination/character_model.dart';
+import '../../model/character_model.dart';
+import '../data/api_service.dart';
 
 part 'rick_state.dart';
 
 class RickCubit extends Cubit<RickState> {
-  RickCubit() : super(RickInitial());
+  RickCubit(this._api) : super(const RickInitial());
 
-  void requestCharacters({int page = 1}) async {
-    emit(Loading());
-    final apiService = ApiService();
-    final result = await apiService.getCharacters(page: page);
-    emit(Success(characterModel: result));
+  final ApiService _api;
+
+  int _page = 1;
+  bool _isFetching = false;
+  bool _hasMore = true;
+  final List<Result> _items = [];
+
+  bool get isFetching => _isFetching;
+  bool get hasMore => _hasMore;
+
+  Future<void> requestCharacters() async {
+    if (_isFetching || !_hasMore) return;
+    _isFetching = true;
+
+    if (_items.isEmpty) {
+      emit(const Loading());
+    }
+
+    try {
+      final model = await _api.getCharacters(page: _page);
+      final next = model.results;
+
+      if (next.isEmpty) {
+        _hasMore = false;
+      } else {
+        _page++;
+        _items.addAll(next);
+        emit(Success(List<Result>.unmodifiable(_items)));
+      }
+    } catch (e) {
+      emit(Error(e.toString()));
+    } finally {
+      _isFetching = false;
+    }
+  }
+
+  Future<void> refresh() async {
+    _page = 1;
+    _isFetching = false;
+    _hasMore = true;
+    _items.clear();
+    await requestCharacters();
   }
 }

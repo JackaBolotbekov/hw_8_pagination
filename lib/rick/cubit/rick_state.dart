@@ -1,15 +1,23 @@
 part of 'rick_cubit.dart';
 
-sealed class RickState {}
-
-final class RickInitial extends RickState {}
-
-final class Loading extends RickState {}
-
-final class Success extends RickState {
-  final CharacterModel characterModel;
-
-  Success({required this.characterModel});
+abstract class RickState {
+  const RickState();
 }
 
-final class Error extends RickState {}
+class RickInitial extends RickState {
+  const RickInitial();
+}
+
+class Loading extends RickState {
+  const Loading();
+}
+
+class Success extends RickState {
+  final List<Result> characters;
+  const Success(this.characters);
+}
+
+class Error extends RickState {
+  final String message;
+  const Error(this.message);
+}
